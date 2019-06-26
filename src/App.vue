@@ -1,13 +1,9 @@
 <template>
   
   <v-container class="contenedor">
-    <NavBar  v-if="this.$route.path != '/login'"/>
-    <router-view></router-view>
+    <NavBar  v-if="navbar"/>
+    <router-view :class="{'container-main':navbar}"></router-view>
   </v-container>
-  <!-- <div>
-     
-  </div> -->
-  
 </template>
 
 <script>
@@ -24,7 +20,27 @@ export default {
   },
   data () {
     return {
+      navbar:true
     }
+  },
+  created(){
+    this.vistaNavbar();
+  },
+  methods:{
+    vistaNavbar(){
+      if (this.$route.path == '/login' || this.$route.path =='/vistaGeneral' ) {
+        this.navbar = false;
+      }else{
+        this.navbar = true;
+      }
+    }
+  },
+  beforeUpdate(){
+    this.vistaNavbar();
+    
+  },
+  updated(){
+    this.vistaNavbar();
   }
 }
 </script>
@@ -35,6 +51,10 @@ export default {
     margin: 0;
     max-width: 100%;
   } 
+
+  .container-main{
+    margin-top: 60px;
+  }
 </style>
 
 

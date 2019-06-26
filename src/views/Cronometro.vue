@@ -46,6 +46,10 @@ export default {
                     v.segundos = '0' + Math.floor((distance % (minute)) / (second));
                 }
 
+                if (v.minutos <= 5 && v.horas == 0) {
+                    v.$emit('alertaTiempo', true);
+                }
+
                 if (v.horas==0 && v.minutos==0 && v.segundos==0) {
                     clearInterval(x);
                 } 

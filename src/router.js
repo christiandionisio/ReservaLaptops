@@ -4,6 +4,7 @@ import Inicio from './views/Inicio.vue'
 import VistaGeneral from './views/VistaGeneral.vue'
 import Login from './views/Login.vue'
 import store from '@/store'
+import Tablas from './views/Tablas.vue'
 
 Vue.use(Router)
 
@@ -31,6 +32,14 @@ const router = new Router({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/tablas',
+      name: 'tablas',
+      component: Tablas,
+      meta: {
+        autenticacion: true
+      }
     }
     ]
 })

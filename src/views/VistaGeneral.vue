@@ -2,7 +2,7 @@
     <v-container grid-list-md text-xs-center>
       <v-layout row wrap>
         <v-flex v-for="laptop in laptops" :key="laptop.id">
-          <v-card class="tarjeta" height="100%"> 
+          <v-card class="tarjeta" :class="{'alerta':laptop.alerta}" height="100%"> 
               <v-card-title class="titulo">
                   <v-container class="align-center">
                       <h3 class="headline mb-0"><i class="fas fa-laptop icono"></i>&nbsp;&nbsp;{{laptop.nombre}}</h3>
@@ -15,7 +15,7 @@
                         <i class="fas fa-user-alt-slash"></i>&nbsp;&nbsp;{{laptop.estado}}
                       </v-chip>
                       <div v-if="laptop.estado=='Ocupado' && laptop.reserva">
-                        <Cronometro class="fuente" :horaRecibida="laptop.reserva.hora_ingreso"/>
+                        <Cronometro class="fuente" :horaRecibida="laptop.reserva.hora_ingreso"  @alertaTiempo="alertaTiempo($event,laptop)"/>
                       </div>
                   </v-container>
               </v-card-title>
@@ -56,7 +56,9 @@ export default {
         .then(response => {
             this.laptops = response.data;
             // eslint-disable-next-line 
-            console.log(this.laptops);
+            this.asignarAlerta();
+            //console.log(this.laptops);
+
         })
         .catch(e => {
             this.errors.push(e);    
@@ -85,11 +87,29 @@ export default {
         }else{
           return true;
         }
+      },
+      alertaTiempo(e,laptop){
+        this.laptops.forEach(element => {
+          //Pone atributo alerta a todas las laptops
+          
+          if (element.id == laptop.id) {
+            element.alerta = e;
+            //console.log(this.laptops);
+            
+          }
+        });
+      },
+      asignarAlerta(){
+        this.laptops.forEach(laptop =>{
+          this.$set(laptop,'alerta',false);
+        });
       }
   },
   mounted(){
     
     this.mostrarLaptops();
+    
+    //console.log(this.laptops);
     
     this.socket.on('MENSAJE_RESERVA', (data) =>{
        this.laptops.map(function(laptop) {
@@ -104,6 +124,7 @@ export default {
         if (laptop.id == data.id_laptop) {
           laptop.estado = "Disponible";
           laptop.reserva = ""; 
+          laptop.alerta = false;
         }  
       });
     });
@@ -132,5 +153,6 @@ export default {
   .fuente{
     font-size: 0.75em;
   }
+
 
 </style>

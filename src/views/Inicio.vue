@@ -3,7 +3,7 @@
     <v-layout row wrap>
 
       <v-flex v-for="laptop in laptops" :key="laptop.id" xs8 sm6 md4 lg3 xl2>
-        <v-card > 
+        <v-card :class="{'alerta': laptop.alerta}" > 
           <v-img
           class="gray--text"
           height="150px"
@@ -28,7 +28,7 @@
                 <i class="fas fa-user-alt-slash"></i>&nbsp;&nbsp;{{laptop.estado}}
               </v-chip>
               <div v-if="laptop.estado=='Ocupado' && laptop.reserva">
-                <Cronometro :horaRecibida="laptop.reserva.hora_ingreso"/>
+                <Cronometro :horaRecibida="laptop.reserva.hora_ingreso" @alertaTiempo="alertaTiempo($event,laptop)"/>
               </div>      
             </v-container>
           </v-card-title>
@@ -92,6 +92,7 @@ export default {
         {headers: { 'content-type': 'application/form-data' }})
         .then(response => {
             this.laptops = response.data;
+            this.asignarAlerta();
             // eslint-disable-next-line 
             //console.log(this.laptops);
         })
@@ -104,7 +105,6 @@ export default {
           if (element.id == laptop.id) {
             this.$set(element,'reserva',e);
             //console.log(this.laptops);
-            
           }
         });
       },
@@ -143,12 +143,23 @@ export default {
         }else{
           return true;
         }
+      },
+      alertaTiempo(e,laptop){
+        this.laptops.forEach(element => {
+          //Pone atributo alerta a todas las laptops
+          if (element.id == laptop.id) {
+            element.alerta = e;
+            //console.log(this.laptops);
+          }
+        });
+      },
+      asignarAlerta(){
+        this.laptops.forEach(laptop =>{
+          this.$set(laptop,'alerta',false);
+        });
       }
   },
   mounted(){
-    // eslint-disable-next-line
-    console.log(this.usuario);
-    
     this.mostrarLaptops();
     
     this.socket.on('MENSAJE_RESERVA', (data) =>{
@@ -163,11 +174,11 @@ export default {
       this.laptops.map(function(laptop) {
         if (laptop.id == data.id_laptop) {
           laptop.estado = "Disponible";
-          laptop.reserva = ""; 
+          laptop.reserva = "";
+          laptop.alerta = false; 
         }  
       });
-      //console.log(this.laptops);
-    });
+    });   
   }
 }
 </script>
@@ -177,6 +188,29 @@ export default {
       font-size: 110px;
       color: #607D8B;
   }
+  .alerta{
+    background: #FF7474 !important;
+    transition: background 0.8s linear 0.4s;
+    /*animation-name: animar;
+    animation-duration: 0.3s;
+    animation-iteration-count: infinite;*/
+  }
+
+  /* @keyframes animar {
+    0% {
+      background: #fff;
+    }
+
+    50% {
+      background: #FF7474;
+    }
+
+    100% {
+      background: #fff;
+    }
+  } */
+
+  
 </style>
 
 
